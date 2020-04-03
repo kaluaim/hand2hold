@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/handsontable@7.0.2/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" integrity="sha256-ENFZrbVzylNbgnXx0n3I1g//2WeO47XxoPe0vkp3NC8=" crossorigin="anonymous" />
+    <title>Hand2Hold</title>
+    <style media="screen">
+        a {
+            /* color: #1c8e8e; */
+            text-decoration: none;
+        }
+
+        a:hover {
+            /* color: #000000; */
+            text-decoration: none;
+        }
+
+        .logo {
+            width: 100px;
+        }
+
+        main {
+            width: 100%;
+            height: 100%;
+            border-top: 5px solid;
+            border-color: #f67280;
+        }
+
+        #row-data {
+            height: 130px;
+            /* max-height: 130px;
+            min-height: 130px; */
+            border-bottom: 1px solid #eee;
+        }
+
+        #row-table {
+            min-height: 400px;
+            height: calc(100vh - 200px);
+            /* background: #d4edda; */
+            padding: 10px;
+        }
+
+        #row-footer {
+            border-top: 1px solid #eee;
+            height: 50px;
+            min-height: 40px;
+            max-height: 40px;
+            padding: 15px 0 0 0;
+        }
+
+        .col-sm {
+            padding: 0;
+        }
+
+        .file-upload {
+            padding: 10px 10px 0 20px;
+            /* margin: -20px 0 0 0; */
+        }
+
+        .btn-primary {
+            background-color: #35477d;
+            border-color: #35477d;
+        }
+
+        .btn-primary:hover {
+            background-color: #6c5b7b;
+            border-color: #6c5b7b;
+        }
+
+        .btn-primary.disabled, .btn-primary:disabled {
+            background-color: #b4b4b5;
+            border-color: #b4b4b5;
+        }
+
+    </style>
+</head>
+<body>
+    <main>
+        <div id="main" class="container-fluid">
+
+            <div id="row-data" class="row">
+                <div class="col-sm-2 col-2 d-flex align-items-center">
+                    <img class="logo" src="hand2hold.svg" alt="Hand2Hold">
+                </div>
+
+                <div id="file-upload" class="col-sm-8 col-8 file-upload d-flex align-items-center">
+                    <div class="input-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="input-file">
+                            <label id="upload-file-label" class="custom-file-label" for="input-file">Upload CSV</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-2 col-2 d-flex align-items-center">
+                    <button id="add-row" type="button" name="button" class="btn btn-primary" style="margin: auto;" disabled>Add row</button>
+                </div>
+            </div>
+
+            <div id="row-table" class="rowbs">
+                <div class="col-sm table-responsive" style="height: 100%;">
+                    <table id="table" style="height: 100%;"></table>
+                </div>
+            </div>
+
+            <div id="row-footer" class="row">
+                <div class="col-sm-10 d-flex align-items-center col-footer">
+                    <span class="text-muted"><small>Hand to Hold</small></span>
+                </div>
+                <div class="col-sm-2 d-flex align-items-center col-footer">
+                    <button id="submit" type="button" class="btn btn-primary btn-block" name="button" disabled>
+                        <span id="submit-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
+                        Submit
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+    <script src="https://cdn.rawgit.com/Keyang/node-csvtojson/d41f44aa/browser/csvtojson.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@7.0.2/dist/handsontable.full.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js" integrity="sha256-3blsJd4Hli/7wCQ+bmgXfOdK7p/ZUMtPXY08jmxSSgk=" crossorigin="anonymous"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
